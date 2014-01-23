@@ -43,18 +43,15 @@ This output will be created upon first opening (user configuring) the applicatio
 
 The Task Level Output will vary by task, although data will be stored in dictionaries and saved a .json files:
 
-    * Measuring WIP (example given in the knitting section with id code KN1, KN2 etc.:
+* Measuring WIP (example given in the knitting section with id code KN1, KN2 etc.:
 
-        WIPDict = { 'DateTime' : [],
-
-                    'KN1' : { 'Attendance' : [],
-                              'Style'      : [],
-                              'WIP'        : [] }
-
-                    'KN2  : { 'Attendance' : [],
-                              'Style'      : [],
-                              'WIP'        : [] }
-
-                  }
+    WIPDict = { 'DateTime' : '01/14/2014 14:36',
+                'KN1'      : { 'Attendance' : 'Present',
+                               'Style'      : 7,
+                               'WIP'        : 4.25 },
+                'KN2       : { 'Attendance' : 'Present',
+                               'Style'      : 'Grunge',
+                               'WIP'        : 0.75 }
+              }
 
 Similar output should be generated for all tasks implemented in this application.

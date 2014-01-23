@@ -1,7 +1,3 @@
-                                                                     
-                                                                     
-                                                                     
-                                             
 # -*- coding: utf-8 -*-
 import console, datetime, json, pprint, sys, time
 
@@ -16,8 +12,7 @@ Questions:
 
 
 Development: I have taken on board the comments of CCC in trying to rework the application. There were a few coding aspects that I did not understand. I have left comments to that effect which are recognisable by a #!! prefix. 
-
-	'''
+'''
 	
 def get_timestamp(in_datetime = None):
 	''' Returns formatted date string '''
@@ -25,8 +20,7 @@ def get_timestamp(in_datetime = None):
 	in_datetime = in_datetime or datetime.datetime.now()
 	return in_datetime.strftime('%Y_%m_%d_%H_%M')
 	#!! I am unsure about line: `in_datetime = in_datetime or datetime.datetime.now()`. What is the meaning of the 'or' here, why not just `datetime.datetime.now()` ?
-
-
+	#ccc: If the caller does not provide a date then subsititute now() as the date provided
 
 def get_user_choice_text(in_title, in_prompt_and_choices): 
 	''' Returns text of user choice '''
@@ -40,7 +34,6 @@ def get_user_choice_text(in_title, in_prompt_and_choices):
 	Error = 'You may not cancel at this time'
 	console.hud_alert(Error, 'error')
 	return get_user_choice_text(in_title, in_prompt_and_choices)
-	
 
 def get_user_choice_num(in_title, in_prompt_and_choices, cancel = True):
 	""" Returns number of user choice. If cancel = True then the user may cancel the dialogue, otherwise cancellations will be met with an hud error message"""
@@ -56,17 +49,16 @@ def get_user_choice_num(in_title, in_prompt_and_choices, cancel = True):
 	Error = 'You may not cancel at this time'
 	console.hud_alert(Error, 'error')
 	return get_user_choice_num(in_title, in_prompt_and_choices, cancel = False)
-	
 
-	
 def get_user_int(in_prompt, in_min = 1, in_max = 100):
 	''' Helper function to prompt user to input an integer. Returns the verified integer'''
-			#!! I was unsure of what the following code added to the keyword arguments so have left the code commented out for now:
-	
-			#(in_min, in_max) = (int(min(in_min, in_max)),
-			#                    int(max(in_min, in_max)))
-	
-			#The function has been extended to include dealing with KeyboardInterrupt and also to retun a hud message to user when the input is incorrect. It has also been extended to confirm that the number entered is in fact an integer rather than just capable of being an integer. 
+	#!! I was unsure of what the following code added to the keyword arguments so have left the code commented out for now:
+
+	#(in_min, in_max) = (int(min(in_min, in_max)),
+	#                    int(max(in_min, in_max)))
+	#ccc: That code just verifies that bot parameters are numbers and that nim is <= max
+
+	#The function has been extended to include dealing with KeyboardInterrupt and also to retun a hud message to user when the input is incorrect. It has also been extended to confirm that the number entered is in fact an integer rather than just capable of being an integer. 
 	
 	try:
 		user_int = console.input_alert(in_prompt)
@@ -77,8 +69,6 @@ def get_user_int(in_prompt, in_min = 1, in_max = 100):
 	Error = 'Error: Please enter a whole number between {} and {}'.format(in_min, in_max)
 	console.hud_alert(Error, 'error')
 	return get_user_int(in_prompt)
-	
-	
 
 def get_user_Sfloat(in_prompt, in_min = 0.25, in_max = 48.0):
 	''' Helper function to prompt the user to enter a 'special' float. Returns the verified special float.
@@ -95,7 +85,6 @@ def get_user_Sfloat(in_prompt, in_min = 0.25, in_max = 48.0):
 	console.hud_alert(Error, 'error')
 	return get_user_Sfloat(in_prompt)
 
-
 def get_user_input(in_prompt, cancel = False):
 	'''Returns user input'''
 	if cancel:
@@ -106,15 +95,11 @@ def get_user_input(in_prompt, cancel = False):
 		return user_input
 	except KeyboardInterrupt:
 		return get_user_input(in_prompt)
-	
-	
 
 def get_user_approval(in_prompt):
 	pass
 		# I suspeect this can be achieved with get_user_choice_text()
 		# Return to this if needed
-
-
 		
 def write_to_json(in_dict, file_name):
 	''' Function to save in_dict to json '''
@@ -123,8 +108,6 @@ def write_to_json(in_dict, file_name):
 		json.dump(in_dict, out_file)
 	return
 
-
-	
 def open_json(file_name, function, f_args):
 	''' Function to open JSON. Returns json file if in directory else the function and arguments that will create the json'''	
 	#!! The idea here is to look for the json file that is passed as the file_name argument and if it is not found in the working directory then the function that creates that file is invoked. For example, upon first using the application the Top Level Output is not yet in existence. When this is the case the routine for creating that will be invoked. I am tyring to be a bit more logical in the way I use these functions, but I'm not sure if this is the best way to go about doing it or not'
@@ -135,8 +118,6 @@ def open_json(file_name, function, f_args):
 	except IOError:
 		return function(*f_args)
 
-
-
 #The following task dictionary contains the names of the tasks that are envisaged (currently 3, although only one (wip) is fully thought through at this stage). The tuple contains the json name in which data related to that task are/will be stored, and a list of the variables that will be collected for each task.
 task_dict = {('Knitters_wip', 		 '11') : ('Knitters_wip.json', 			['Attendence', 'Style', 'WIP']),
              ('Linkers_wip' , 		 '12') : ('Linkers_wip.json',  			['Attendence', 'Style', 'WIP']),
@@ -144,8 +125,6 @@ task_dict = {('Knitters_wip', 		 '11') : ('Knitters_wip.json', 			['Attendence',
              ('Linkers_interact',  '22') : ('Linkers_interact.json',	['enter_once_determined']),
              ('Knitters_other',		 '31') : ('Knitters_other.json',    ['enter_once_determined']),
              ('Linkers_other', 		 '32') : ('Linkers_other.json',	    ['enter_once_determined'])}
-
-
 
 def create_task_dicts(top_level_dict, task_dict):
 	""" Function to create task dictionaries. This is designed to be called inside the configure application function. Saves each dict to .json"""
@@ -159,7 +138,6 @@ def create_task_dicts(top_level_dict, task_dict):
 		                       for serial_no in xrange(1, top_level_dict[department] + 1)})
 		write_to_json(task_dict_json, task_dict[task][0])
 	return
-	
 
 #A string that is used in the configure_appication function
 #¡¡ What is the benfit of making this a global variable rather than one local to the function? It is purely a cleanliness thing (i.e. to keep the function a bit tidier?). Also, why not pass it as an argument to the function?
@@ -169,8 +147,6 @@ Top_validation_fmt = ''' You have entered the following data:
 	'Linkers' : 	{Linkers}
 
 Are you satisfied with this?'''
-
-
 
 def configure_application(file_name):
 	""" Creates and returns the top level dictionary and the task dictionaries. Additioanlly tests user satisfaction with the top level data entered and saves to json. It is intended that this is the function that is returned by the open_json function if the json does not already exist when opening the top_level_data."""
@@ -199,8 +175,6 @@ def configure_application(file_name):
 
 	return top_level_dict
 
-
-
 def determine_task(user_task_dict = task_dict):
 	''' Function prompts user to determine which task is to be undertaken and return the key (a tuple) that relates to that task fom the task_dict'''
 	
@@ -220,10 +194,7 @@ def determine_task(user_task_dict = task_dict):
 		if user_task_choice in task_tuple: 
 			return task_tuple
 
-
 #task_function_dict = 	{'Knitters_wip' : wip_task}
-
-
 
 #A string that is used to display the wip data back to the user
 wip_validation_fmt = ''' You have entered the following data for worker {}:
@@ -233,8 +204,6 @@ wip_validation_fmt = ''' You have entered the following data for worker {}:
     'WIP'		 : {WIP} 
 
 Are you satisfied with this?'''
-
-
 
 def worker_wip(worker_code):
 	""" Function to create individual worker WIP dict """
@@ -284,17 +253,13 @@ def worker_wip(worker_code):
 	
 	return worker_dict #return the worker wip dict
 
-	
-		
 def create_worker_code(top_level_dict, department):
 	""" Function returns a list of the worker codes."""
 	#!! This is somewhat surplus to requirements. The issue is that running though the worker codes in the dictionary json presents the codes out of order. Perhaps an ordered dict could be used instead?
 	
 	return [department[:2].upper() + str(serial_no) for serial_no in 
 	        						xrange(1, top_level_dict[department] + 1)]	
-	
-		
-				
+
 def wip_task(task_tuple, top_level_dict, task_data_dict):
 	""" Updates relevant wip data dictionary"""
 	
@@ -306,7 +271,6 @@ def wip_task(task_tuple, top_level_dict, task_data_dict):
 			task_data_dict[worker_code][data_point].append(worker_wip_dict[data_point])
 	
 	return task_data_dict
-	
 
 def interact_task():
 	# complete once defined
@@ -318,15 +282,13 @@ def other_task():
 	print 'TBC'
 	return
 
-
 def initiate_task(task_tuple, task_function_dict):
 	task = task_tuple[0].split('_')[1]
 	return task_function_dict[task][0](*task_function_dict[task][1])
 
-
-
 ###########################################################################################################
 #Run the program
+<<<<<<< HEAD
 console.clear()
 print 'Welcome to RMG Observations'
 top_level_dict = open_json('top_level_data.json', configure_application, ('top_level_data.json',))
@@ -343,12 +305,35 @@ write_to_json(modified_task_dict, task_file_name)
 
 
 
+=======
+>>>>>>> 9542f3cd86c99af7ccdace3de292e2b377dd1191
 def main(argv):
-	#¡¡ at present I am unsure as to what this function does. I realise that it is probably the right way yo go about this type of application, but I could not make it work for me, so for now i pass and return to it at a later date
-	pass
+	console.clear()
+	print 'Welcome to RMG Observations'
+	top_level_dict = open_json('top_level_data.json', configure_application, ('top_level_data.json',))
+	task_tuple = determine_task()
+	task_file_name = task_dict[task_tuple][0]
+	task_data_dict = open_json(task_file_name, None, None)
 
-#if __name__ == '__main__':
-#	sys.exit(main(sys.argv))
+	task_function_dict = {'wip'      : (wip_task, (task_tuple, top_level_dict, task_data_dict)),
+        	              'interact' : (interact_task, (())),
+                	      'other'    : (other_task, (())) }
+	modified_task_dict = initiate_task(task_tuple, task_function_dict)
+	write_to_json(modified_task_dict, task_file_name)
+
+	'''
+	at present I am unsure as to what this function does. I realise that it is probably the right way 
+	to go about this type of application, but I could not make it work for me, so for now i pass and
+	return to it at a later date
+	
+	ccc: This style allows me to use the same file as both a application and as a module
+	     If I later write another script where I need get_user_input() then I can just
+	     import this_file and call get_user_input() without having to rewrite it.
+	see: http://docs.python.org/2/tutorial/modules.html#executing-modules-as-scripts
+	'''
+
+if __name__ == '__main__':
+	sys.exit(main(sys.argv))
 
 	
 

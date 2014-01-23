@@ -268,7 +268,7 @@ def worker_wip(worker_code):
 		return worker_dict #return the worker wip dict
 	
 	# If operator present
-	worker_dict['Attendance'] ='Present'
+	worker_dict['Attendence'] ='Present'
 	prompt = 'Please enter current style name/number as per work order: '
 	worker_dict['Style'] = get_user_input(prompt).strip().lower()
 	prompt = 'Please enter the amount of WIP at time of checking: '

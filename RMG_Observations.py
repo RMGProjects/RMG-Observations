@@ -230,7 +230,7 @@ wip_validation_fmt = ''' You have entered the following data for worker {}:
 	
     'Attendence' : {Attendence} 
     'Style'      : {Style}
-    'WIP'				 : {WIP} 
+    'WIP'		 : {WIP} 
 
 Are you satisfied with this?'''
 
@@ -263,7 +263,7 @@ def worker_wip(worker_code):
 	                                       ('Select one', 'Yes', 'No'))
 		if user_satisfied == 'No':
 
-			return worker_wip() #re-enter worker wip data
+			return worker_wip(worker_code) #re-enter worker wip data
 	
 		return worker_dict #return the worker wip dict
 	

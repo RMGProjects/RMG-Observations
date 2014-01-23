@@ -280,7 +280,7 @@ def worker_wip(worker_code):
 	user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
 	                                       ('Select one', 'Yes', 'No'))
 	if user_satisfied == 'No':
-		return worker_wip() #re-enter worker wip data
+		return worker_wip(worker_code) #re-enter worker wip data
 	
 	return worker_dict #return the worker wip dict
 
@@ -340,15 +340,6 @@ task_function_dict = {'wip' 			: (wip_task, (task_tuple, top_level_dict, task_da
 
 modified_task_dict = initiate_task(task_tuple, task_function_dict)
 write_to_json(modified_task_dict, task_file_name)
-
-
-
-
-
-
-
-
-
 
 
 

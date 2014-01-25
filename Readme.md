@@ -52,7 +52,7 @@ This output will be created upon first opening (user configuring) the applicatio
 
 The Task Level Output will vary by task, although data will be stored in dictionaries and saved a .json files:
 
-* Measuring WIP (example given in the knitting section with id code KN1, KN2 etc.:
+* Measuring WIP (example given in the knitting section with machine id code KN1, KN2 etc.:
 
     WIPDict = { 'DateTime' : '01/14/2014 14:36',
                 'KN1'      : { 'Attendance' : 'Present',
@@ -68,6 +68,19 @@ Similar output should be generated for all tasks implemented in this application
 **Other Functionality:** The application will perform a variety of other functions. At present these are thought to include:
 
 1. **Entering Operator ID Numbers** - Conceptually the observations are at the machine level. Therefore each day the first thing the user should do is for each section to enter the worker ID numbers as given by the factory for each machine that is part of the team being observed.
+
+The data that this process will generate will take the following format:
+
+	Knitting_IDs = {	'Date' : '01/14/2014',
+						'KN1'  : 'foo'
+						'KN2   : 'bar'}
+
+This data will be saved to .json. There will one such file created per day for the Knitting section, and one for the Linking section. This process will be completed upon the user first opening the application which will allow the data to be shared across all the task that need to be completed.
+
+This process will supercede the need for the user to comment on the Attendance of each operator during the tasks.
+
+One potential issue is that when the process is first undertaken during the morning and the data is stored a machine may be 'unmanned' (i.e. operator did not show) but by the time that a task is undertaken that operator has arrive (i.e. he was late). The task will have to have a routine that allows the user to modify whether the machine is manned or not. 
+
 
 2. **Syncing to dropbox** - All data will be synched to drop box
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import console, datetime, json, pprint, sys, time
+import console, datetime, json, pprint, sys, time, Image, photos
 
 '''
 Questions:
@@ -151,12 +151,12 @@ is fully thought through at this stage). The tuple contains the json name in whi
 be stored, and a list of the variables that will be collected for each task.
 '''
 
-task_dict = {('Knitters_wip',      '11') : ('Knitters_wip.json',      ['Attendance', 'Style', 'WIP']),
-             ('Linkers_wip',       '12') : ('Linkers_wip.json',       ['Attendance', 'Style', 'WIP']),
-             ('Knitters_interact', '21') : ('Knitters_interact.json', ['enter_once_determined']),
-             ('Linkers_interact',  '22') : ('Linkers_interact.json',  ['enter_once_determined']),
-             ('Knitters_other',    '31') : ('Knitters_other.json',    ['enter_once_determined']),
-             ('Linkers_other',     '32') : ('Linkers_other.json',     ['enter_once_determined'])}
+task_dict = {('Knitting_wip',      '11') : ('Knitting_wip.json',      ['Attendance', 'Style', 'WIP']),
+             ('Linking_wip',       '12') : ('Linking_wip.json',       ['Attendance', 'Style', 'WIP']),
+             ('Knitting_interact', '21') : ('Knitting_interact.json', ['enter_once_determined']),
+             ('Linking_interact',  '22') : ('Linking_interact.json',  ['enter_once_determined']),
+             ('Knitting_other',    '31') : ('Knitting_other.json',    ['enter_once_determined']),
+             ('Linking_other',     '32') : ('Linking_other.json',     ['enter_once_determined'])}
 
 def create_task_dicts(top_level_dict, task_dict):
     """ Function to create task dictionaries. This is designed to be called inside the configure application
@@ -183,8 +183,8 @@ def create_task_dicts(top_level_dict, task_dict):
 Top_validation_fmt = '''
 You have entered the following data:
 	
-	'Knitters': 	{Knitters}
-	'Linkers' : 	{Linkers}
+	'Knitting': 	{Knitting}
+	'Linking' : 	{Linking}
 
 Are you satisfied with this? '''
 
@@ -199,8 +199,8 @@ def configure_application(file_name):
     time.sleep(4)
 	
     # create top level dictionary
-    top_level_dict = { 'Knitters' : get_user_int('Please enter the number of Knitting Operators'),
-                       'Linkers'  : get_user_int('Please enter the number of Linking Operators') }
+    top_level_dict = { 'Knitting' : get_user_int('Please enter the number of Knitting Operators'),
+                       'Linking'  : get_user_int('Please enter the number of Linking Operators') }
 
     print(Top_validation_fmt.format(**top_level_dict))  # print data back to user
 
@@ -217,6 +217,51 @@ def configure_application(file_name):
     create_task_dicts(top_level_dict, task_dict)
 
     return top_level_dict
+	
+def create_id_dicts(top_level_dict):
+	""" Creates and returns the worker ID dicts for the Knitting and Linking section """
+	
+	dept_choice = str(get_user_choice_text('Select a department', ('Please select which department to work in',
+	                          		                              'Knitting',
+	                              		                          'Linking')))
+																  
+	id_dict = 	{date_time : str()}
+	id_dict.update(	{dept_choice[:2].upper() + serial_no : 
+					str() for serial_no in xrange(1, top_level_dict[dept_choice] + 1)})
+	
+	return id_dict
+
+def locate_most_recent(file_prefix):
+	""" Function returns the most recent file that contains file_prefix if any exist"""		
+	file_list = os.listdir(os.getcwd())
+	prefix_file_list = [file for file in file_list if file_prefix in file]
+	if not prefix_file_list:
+		return 'None' #Not sure about this yet, return to it.
+	date_list = [date for date in [file.split('-')[1] for file in prefix_file_list] # Note the character on which to
+																					#split the file name is currently '-'	
+	datetime_list = [datetime.datetime.strptime(date, '%Y_%m_%d_%H_%M') for date in date_list]
+	most_recent_date = max(datetime_list)
+	most_recent_file = file_prefix + '-' + most_recent_date.strftime('%Y_%m_%d_%H_%M')
+	
+	
+def populate_id_dicts(id_dict):
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 def determine_task(user_task_dict = task_dict):
     ''' Function prompts user to determine which task is to be undertaken and return the key (a tuple) that relates
@@ -238,63 +283,62 @@ def determine_task(user_task_dict = task_dict):
 		if user_task_choice in task_tuple: 
 			return task_tuple
 
-#task_function_dict = 	{'Knitters_wip' : wip_task}
 
 #A string that is used to display the wip data back to the user
 wip_validation_fmt = ''' You have entered the following data for worker {}:
 	
-    'Attendence' : {Attendence} 
+    'Attendance' : {Attendance} 
     'Style'.     : {Style}
     'WIP'        : {WIP} 
 
 Are you satisfied with this?'''
 
-def worker_wip(worker_code):
+def worker_wip(machine_code):
     """ Function to create individual worker WIP dict """
 
     console.clear()
-    print('For worker {} please enter thee following information: \n'.format(worker_code))
+    print('For worker {} please enter thee following information: \n'.format(machine_code))
 
     # Worker wip dictionary
-    worker_dict = { 'Attendence' : 'Absent',
+    worker_dict = { 'Attendance' : 'Absent',
 	            'Style'.     : 'null',
 	            'WIP'        : 'null' }
     # Determine absence
-    user_choice = get_user_choice_text('{} : Is the operator present?'.format(worker_code), 
+    user_choice = get_user_choice_text('{} : Is the operator present?'.format(machine_code), 
 	                                    ('Please select an option', 'Present', 'Absent',))
     # If operator not present
     if user_choice != 'Present':
-         print wip_validation_fmt.format(worker_code, **worker_dict)  # print data back to user
+         print wip_validation_fmt.format(machine_code, **worker_dict)  # print data back to user
          time.sleep(2)
 
     #check user satisfaction
     user_satisfied = get_user_choice_text('Are you satisfied with data entered?',
                                              ('Select one', 'Yes', 'No'))
     if user_satisfied == 'No':
-        return worker_wip(worker_code)  # re-enter worker wip data
+        return worker_wip(machine_code)  # re-enter worker wip data
 
     return worker_dict  # return the worker wip dict
 
     # !!! THE FOLLOWING CODE WILL NEVER GET EXECUTED !!!
 	
     # If operator present
-    worker_dict['Attendence'] ='Present'
+    worker_dict['Attendance'] ='Present'
     prompt = 'Please enter current style name/number as per work order: '
     worker_dict['Style'] = get_user_input(prompt).strip().lower()
     prompt = 'Please enter the amount of WIP at time of checking: '
     worker_dict['WIP'] = get_user_Sfloat(prompt)
 
-    print wip_validation_fmt.format(worker_code, **worker_dict) # print data back to user
+    print wip_validation_fmt.format(machine_code, **worker_dict) # print data back to user
     time.sleep(4)
 	
     user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
 	                                       ('Select one', 'Yes', 'No'))
     if user_satisfied == 'No':
-        return worker_wip(worker_code) #re-enter worker wip data
+        return worker_wip(machine_code) #re-enter worker wip data
 	
     return worker_dict #return the worker wip dict
 
-def create_worker_code(top_level_dict, department):
+def create_machine_code(top_level_dict, department):
     """ Function returns a list of the worker codes. """
     #!! This is somewhat surplus to requirements. The issue is that running though the worker codes in the dictionary
     #   json presents the codes out of order. Perhaps an ordered dict could be used instead?
@@ -306,10 +350,10 @@ def wip_task(task_tuple, top_level_dict, task_data_dict):
 
     task_data_dict['date_time'].append(get_timestamp())
     department = task_tuple[0].split('_')[0]
-    for worker_code in create_worker_code(top_level_dict, department):
-        worker_wip_dict = worker_wip(worker_code)
-        for data_point in task_data_dict[worker_code]:
-            task_data_dict[worker_code][data_point].append(worker_wip_dict[data_point])
+    for machine_code in create_machine_code(top_level_dict, department):
+        worker_wip_dict = worker_wip(machine_code)
+        for data_point in task_data_dict[machine_code]:
+            task_data_dict[machine_code][data_point].append(worker_wip_dict[data_point])
 
     return task_data_dict
 
@@ -326,6 +370,22 @@ def other_task():
 def initiate_task(task_tuple, task_function_dict):
     task = task_tuple[0].split('_')[1]
     return task_function_dict[task][0](*task_function_dict[task][1])
+	
+def get_user_photo():
+	''' Prompts the user to take an image and returns the image. The user may not cancel'''
+	user_photo = photos.capture_image()
+	if user_photo is None:
+		Error = 'You may not cancel the photograph at this time'
+		console.hud_alert(Error, 'error')
+		return get_user_image()
+	return user_photo
+	
+def save_user_photo(photo, task_name):
+	''' Saves user photo with timestamp and name related to the task '''
+	time_stamp = get_timestamp()
+	file_name = task_name + time_stamp + '.jpeg'
+	photo.save(file_name)
+	
 
 ###########################################################################################################
 #Run the program
@@ -343,6 +403,7 @@ task_function_dict = {'wip'.     : (wip_task, (task_tuple, top_level_dict, task_
 
 modified_task_dict = initiate_task(task_tuple, task_function_dict)
 write_to_json(modified_task_dict, task_file_name)
+save_user_photo(get_user_photo(), task_tuple[0])
 
 =======
 >>>>>>> 9542f3cd86c99af7ccdace3de292e2b377dd1191
@@ -359,15 +420,9 @@ def main(argv):
                            'other'   : (other_task, (())) }
     modified_task_dict = initiate_task(task_tuple, task_function_dict)
     write_to_json(modified_task_dict, task_file_name)
+	save_user_photo(get_user_photo(), task_tuple[0])
 
 	'''
-	at present I am unsure as to what this function does. I realise that it is probably the right way 
-	to go about this type of application, but I could not make it work for me, so for now i pass and
-	return to it at a later date
-	
-	ccc: This style allows me to use the same file as both a application and as a module
-	     If I later write another script where I need get_user_input() then I can just
-	     import this_file and call get_user_input() without having to rewrite it.
 	see: http://docs.python.org/2/tutorial/modules.html#executing-modules-as-scripts
 	'''
 

@@ -17,11 +17,20 @@ Purpose of the application is to allow the user to make observations of work in 
 2. **Linking** - The operators in the linking section take the completed bundles from the knitting section and link (i.e. sew) the panels together to form a sweater. As with the knitters they work with bundles of 12. They are geographically distinct from the knitters (different floor).
 
     In general there are 32 linking operators in a team and they will have one direct supervisor.
-        
+	
+Within each of those sections, the observer will make observations relating to one 'team' of workers. This team is a team that is receiving training as part of a consultancy program and the observations are being made to try to understand how that training affects the way the line works. It is a complex process of measurement of which this application forms only a part. In addition a huge volume of production and HR data will be collected, and various other types of survey work will be undertaken. 
+
+Note that at present it is thought that only one team will be followed in each section. This is the team just described, the 'treatment' team. However, it seems possible that this will be expanded to include a 'control' team as well. 
+	
+For both Knitting and Linking sections it may prove most useful to think in terms of machines rather than people. This is because the physical space that will be observed will not change, but the operators working in that space may well change. Thus it is unlikely that the machines within the 'team' space will move or change locations (they are large machines, and do not move frequently) whereas the people working those machines may well change either becasue operators leave their work and others replace them, or (unlikely) operators are shifted to different locations within the team)
+
+The factory separately provide the project with data on the individuals that work in the factory which includes attendance and other information about the worker. This data will include the worker ID number as given by the factory. Therefore, if the user is prompted once a day to enter the worker ID numbers of those people he finds working on the line, then this information can be matched with the data provided by the factory. In the program therefore, all references to worker codes should be understood rather as machine codes [perhaps edit the code to make more intuitive]        
 
 In the factories under observation, the observer (i.e. the user of this application) will be present daily, and they will follow a strict diary of the tasks that need to be completed. The tasks will always relate to the same group of knitting/linking operators throughout the duration of the project. Therefore, upon first opening the application, the numbers to be followed, and their ID codes etc need to be determined/input
 
-The observations are strictly controlled i.e. should not provide felxibility to the user as to what data are entered once a task is begun. If a task is begun then it must be completed for every operator for which there is an id code. If a data point is not reuqired for an opeartor under observation, then a null value should be entered and it should be clear from the data structure as to why that data point was not required.
+The observations are strictly controlled i.e. should not provide flexibility to the user as to what data are entered once a task is begun. If a task is begun then it must be completed for every operator for which there is an id code. If a data point is not reuqired for an opeartor under observation, then a null value should be entered and it should be clear from the data structure as to why that data point was not required.
+
+At present the project is in a pilot phase which means that the application will be used in one factory, by one observer. However, conditional on funding and the success of the pilot, this project will be rolled out to around 25 factories with multiple observers. 
 
 
 **Tasks:** Currently two tasks are contemplated although the application has a lot of potential to be expanded. at present the application should be written such that future tasks can be added:
@@ -55,3 +64,13 @@ The Task Level Output will vary by task, although data will be stored in diction
               }
 
 Similar output should be generated for all tasks implemented in this application.
+
+**Other Functionality:** The application will perform a variety of other functions. At present these are thought to include:
+
+1. **Entering Operator ID Numbers** - Conceptually the observations are at the machine level. Therefore each day the first thing the user should do is for each section to enter the worker ID numbers as given by the factory for each machine that is part of the team being observed.
+
+2. **Syncing to dropbox** - All data will be synched to drop box
+
+3. **Verifying Observer Presence** - It may seem draconian but it is important that the project manager can monitor the observer to check that he is in fact in the factory making the observations. The factory is geographically remote from the head office, and the project manager will rarely be in the field. Ideally this would be achieved with GPS coordinates, however due to limited 3G coverage and no wireless networks in factories, this will not be. One solution could be to prompt the user to take a photo of himself with some identifying object from the factory upon completion of each task [or once in the morning, one in the evening?]
+
+

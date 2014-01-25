@@ -3,180 +3,224 @@ import console, datetime, json, pprint, sys, time
 
 '''
 Questions:
-	1. Are there any serious disadvantages from having the output of a task be a single dictionary that contains all observations?
-	2. Will it be possible to store the outtput files in a dropbox folder?
-	3. Is it better to build one application that does multiple tasks, or should tasks be separate? There is no real need for this application to be uploaded to the AppStore as I can personally load the code into Pythonista on the iPads that will be used by the observers (the teams are very small)
-	4. Is there a more interesting interface that could be used? The console is fine, but its a bit uninspiring. Ideally after configuration the application would create a button for each operator which maps to some idea of the pysical reality of their location on the floor, and then when undertaking tasks the user would simply touch the button to initialise the prompts for information. This is especially the case fot hee interaction task (see readMe) 
-	5. Whilst I do not want to allow the user to 'cancel' dialogue boxes (as they return KeyboardInterrupt) which will cause the program to crash, and I do not want them to be capable of being pressed by accident, I do want the user to be able to escape a task (and lose all accumulated data), if a task is entered accidentally. Is this achievable?
-	6. I do not currently understand the main(argv) function, so I have left it blank for now and tried to write the routine in linear format I guess. What does the function do? Does it assist if the ipad 'home' button is pressed accidentally? This is something I will need to consider. I do not want to lose information as the user accidentally pressed the home button. I will try to brush up on what is going on here.  
+    1. Are there any serious disadvantages from having the output of a task be a single dictionary that contains
+       all observations?
+    2. Will it be possible to store the outtput files in a dropbox folder?
+    3. Is it better to build one application that does multiple tasks, or should tasks be separate? There is no
+       real need for this application to be uploaded to the AppStore as I can personally load the code into
+       Pythonista on the iPads that will be used by the observers (the teams are very small)
+    4. Is there a more interesting interface that could be used? The console is fine, but its a bit uninspiring.
+       Ideally after configuration the application would create a button for each operator which maps to some
+       idea of the pysical reality of their location on the floor, and then when undertaking tasks the user would
+       simply touch the button to initialise the prompts for information. This is especially the case for the
+       interaction task (see readMe) 
+    5. Whilst I do not want to allow the user to 'cancel' dialogue boxes (as they return KeyboardInterrupt) which
+       will cause the program to crash, and I do not want them to be capable of being pressed by accident, I do
+       want the user to be able to escape a task (and lose all accumulated data), if a task is entered accidentally.
+       Is this achievable?
+    6. I do not currently understand the main(argv) function, so I have left it blank for now and tried to write the
+       routine in linear format I guess. What does the function do? Does it assist if the ipad 'home' button is
+       pressed accidentally? This is something I will need to consider. I do not want to lose information as the
+       user accidentally pressed the home button. I will try to brush up on what is going on here.  
 
-
-Development: I have taken on board the comments of CCC in trying to rework the application. There were a few coding aspects that I did not understand. I have left comments to that effect which are recognisable by a #!! prefix. 
+    Development: I have taken on board the comments of CCC in trying to rework the application. There were a few
+       coding aspects that I did not understand. I have left comments to that effect which are recognisable by a #!!
+       prefix. 
 '''
 	
 def get_timestamp(in_datetime = None):
-	''' Returns formatted date string '''
-	
-	in_datetime = in_datetime or datetime.datetime.now()
-	return in_datetime.strftime('%Y_%m_%d_%H_%M')
-	#!! I am unsure about line: `in_datetime = in_datetime or datetime.datetime.now()`. What is the meaning of the 'or' here, why not just `datetime.datetime.now()` ?
-	#ccc: If the caller does not provide a date then subsititute now() as the date provided
+    ''' Returns formatted date string '''
+
+    in_datetime = in_datetime or datetime.datetime.now()
+    return in_datetime.strftime('%Y_%m_%d_%H_%M')
+    #!! I am unsure about line: `in_datetime = in_datetime or datetime.datetime.now()`. What is the meaning of 
+    #   the 'or' here, why not just `datetime.datetime.now()` ?
+    #ccc: If the caller does not provide a date then subsititute now() as the date provided
 
 def get_user_choice_text(in_title, in_prompt_and_choices): 
-	''' Returns text of user choice '''
-	#!! This has been extended to deal with the KeyboardInterrupt that is returned if 'cancel' is selected. Additionally it may now return either text or 
+    ''' Returns text of user choice '''
+    #!! This has been extended to deal with the KeyboardInterrupt that is returned if 'cancel' is selected.
+    #   Additionally it may now return either text or 
  	
-	try:
-		user_choice = in_prompt_and_choices[console.alert(in_title, *in_prompt_and_choices)]
-		return user_choice
-	except KeyboardInterrupt:
-		pass
-	Error = 'You may not cancel at this time'
-	console.hud_alert(Error, 'error')
-	return get_user_choice_text(in_title, in_prompt_and_choices)
+    try:
+        user_choice = in_prompt_and_choices[console.alert(in_title, *in_prompt_and_choices)]
+	return user_choice
+    except KeyboardInterrupt:
+        pass
+    Error = 'You may not cancel at this time'
+    console.hud_alert(Error, 'error')
+    return get_user_choice_text(in_title, in_prompt_and_choices)
 
 def get_user_choice_num(in_title, in_prompt_and_choices, cancel = True):
-	""" Returns number of user choice. If cancel = True then the user may cancel the dialogue, otherwise cancellations will be met with an hud error message"""
-	#¡¡ Possibly this function could be combined with the above i.e add an argument format = text/num. However, perhaps that is too messy. There is no need to allow the user to cancel the dialogues generated by the text version of this function (yet), so it is not added there. 
-	if cancel:
-		user_choice = console.alert(in_title, *in_prompt_and_choices)
-		return user_choice
-	try:
-		user_choice = console.alert(in_title, *in_prompt_and_choices)
-		return user_choice
-	except KeyboardInterrupt:
-		pass
-	Error = 'You may not cancel at this time'
-	console.hud_alert(Error, 'error')
-	return get_user_choice_num(in_title, in_prompt_and_choices, cancel = False)
+    """ Returns number of user choice. If cancel = True then the user may cancel the dialogue, otherwise
+        cancellations will be met with an hud error message """
+    #¡¡ Possibly this function could be combined with the above i.e add an argument format = text/num. However,
+    #   perhaps that is too messy. There is no need to allow the user to cancel the dialogues generated by the
+    #   text version of this function (yet), so it is not added there. 
+    if cancel:
+        user_choice = console.alert(in_title, *in_prompt_and_choices)
+        return user_choice
+    try:
+        user_choice = console.alert(in_title, *in_prompt_and_choices)
+        return user_choice
+    except KeyboardInterrupt:
+	pass
+    Error = 'You may not cancel at this time'
+    console.hud_alert(Error, 'error')
+    return get_user_choice_num(in_title, in_prompt_and_choices, cancel = False)
 
 def get_user_int(in_prompt, in_min = 1, in_max = 100):
-	''' Helper function to prompt user to input an integer. Returns the verified integer'''
-	#!! I was unsure of what the following code added to the keyword arguments so have left the code commented out for now:
+    ''' Helper function to prompt user to input an integer. Returns the verified integer'''
+    #!! I was unsure of what the following code added to the keyword arguments so have left the code commented out
+    #   for now:
 
-	#(in_min, in_max) = (int(min(in_min, in_max)),
-	#                    int(max(in_min, in_max)))
-	#ccc: That code just verifies that bot parameters are numbers and that nim is <= max
+    #(in_min, in_max) = (int(min(in_min, in_max)),
+    #                    int(max(in_min, in_max)))
+    #ccc: That code just verifies that both parameters are numbers and that min is <= max
 
-	#The function has been extended to include dealing with KeyboardInterrupt and also to retun a hud message to user when the input is incorrect. It has also been extended to confirm that the number entered is in fact an integer rather than just capable of being an integer. 
-	
-	try:
-		user_int = console.input_alert(in_prompt)
-		if in_min <= int(user_int) <= in_max and float(user_int)%1 == 0:
-			return int(user_int)
-	except (ValueError, KeyboardInterrupt):
-		pass
-	Error = 'Error: Please enter a whole number between {} and {}'.format(in_min, in_max)
-	console.hud_alert(Error, 'error')
-	return get_user_int(in_prompt)
+    # The function has been extended to include dealing with KeyboardInterrupt and also to retun a hud message to
+    # user when the input is incorrect. It has also been extended to confirm that the number entered is in fact an
+    # integer rather than just capable of being an integer. 
+
+    try:
+        user_int = console.input_alert(in_prompt)
+        if in_min <= int(user_int) <= in_max and float(user_int)%1 == 0:
+            return int(user_int)
+    except (ValueError, KeyboardInterrupt):
+        pass
+    Error = 'Error: Please enter a whole number between {} and {}'.format(in_min, in_max)
+    console.hud_alert(Error, 'error')
+    return get_user_int(in_prompt)
 
 def get_user_Sfloat(in_prompt, in_min = 0.25, in_max = 48.0):
-	''' Helper function to prompt the user to enter a 'special' float. Returns the verified special float.
-	    Special in this instance means that the float is a multiple of 0.25'''
-	    #This is a new function in the style of get_user_int()
-			
-	try:
-		user_Sfloat = console.input_alert(in_prompt)
-		if float(in_min) <= float(user_Sfloat) <= in_max and float(user_Sfloat)%0.25 == 0:
-			return float(user_Sfloat)
-	except (ValueError, KeyboardInterrupt):
-		pass
-	Error = 'Error: Please enter a number beetween {} and {} that is a multiple of 0.25'.format(in_min, in_max)
-	console.hud_alert(Error, 'error')
-	return get_user_Sfloat(in_prompt)
+    ''' Helper function to prompt the user to enter a 'special' float. Returns the verified special float.
+        Special in this instance means that the float is a multiple of 0.25'''
+    # This is a new function in the style of get_user_int()
+
+    try:
+        user_Sfloat = console.input_alert(in_prompt)
+        if float(in_min) <= float(user_Sfloat) <= in_max and float(user_Sfloat)%0.25 == 0:
+            return float(user_Sfloat)
+    except (ValueError, KeyboardInterrupt):
+        pass
+    Error = 'Error: Please enter a number beetween {} and {} that is a multiple of 0.25'.format(in_min, in_max)
+    console.hud_alert(Error, 'error')
+    return get_user_Sfloat(in_prompt)
 
 def get_user_input(in_prompt, cancel = False):
-	'''Returns user input'''
-	if cancel:
-		user_input = console.input_alert(in_prompt)
-		return user_input
-	try:
-		user_input = console.input_alert(in_prompt)
-		return user_input
-	except KeyboardInterrupt:
-		return get_user_input(in_prompt)
+    '''Returns user input'''
+    if cancel:
+        user_input = console.input_alert(in_prompt)
+        return user_input
+    try:
+        user_input = console.input_alert(in_prompt)
+        return user_input
+    except KeyboardInterrupt:
+        return get_user_input(in_prompt)
 
 def get_user_approval(in_prompt):
-	pass
-		# I suspeect this can be achieved with get_user_choice_text()
-		# Return to this if needed
-		
+    pass
+    # I suspeect this can be achieved with get_user_choice_text()
+    # Return to this if needed
+
 def write_to_json(in_dict, file_name):
-	''' Function to save in_dict to json '''
-	
-	with open(file_name, 'w') as out_file:
-		json.dump(in_dict, out_file)
-	return
+    ''' Function to save in_dict to json '''
+
+    with open(file_name, 'w') as out_file:
+        json.dump(in_dict, out_file)
+    return
 
 def open_json(file_name, function, f_args):
-	''' Function to open JSON. Returns json file if in directory else the function and arguments that will create the json'''	
-	#!! The idea here is to look for the json file that is passed as the file_name argument and if it is not found in the working directory then the function that creates that file is invoked. For example, upon first using the application the Top Level Output is not yet in existence. When this is the case the routine for creating that will be invoked. I am tyring to be a bit more logical in the way I use these functions, but I'm not sure if this is the best way to go about doing it or not'
-	
-	try:
-		out_dict = json.load(open(file_name))
-		return out_dict
-	except IOError:
-		return function(*f_args)
+    ''' Function to open JSON. Returns json file if in directory else the function and arguments that will create
+        the json'''	
+    #!! The idea here is to look for the json file that is passed as the file_name argument and if it is not found
+    #   in the working directory then the function that creates that file is invoked. For example, upon first using
+    #   the application the Top Level Output is not yet in existence. When this is the case the routine for creating
+    #   that will be invoked. I am tyring to be a bit more logical in the way I use these functions, but I'm not sure
+    #   if this is the best way to go about doing it or not.
 
-#The following task dictionary contains the names of the tasks that are envisaged (currently 3, although only one (wip) is fully thought through at this stage). The tuple contains the json name in which data related to that task are/will be stored, and a list of the variables that will be collected for each task.
-task_dict = {('Knitters_wip', 		 '11') : ('Knitters_wip.json', 			['Attendence', 'Style', 'WIP']),
-             ('Linkers_wip' , 		 '12') : ('Linkers_wip.json',  			['Attendence', 'Style', 'WIP']),
+    try:
+        out_dict = json.load(open(file_name))
+	    return out_dict
+    except IOError:
+        return function(*f_args)
+
+'''
+The following task dictionary contains the names of the tasks that are envisaged (currently 3, although only one (wip)
+is fully thought through at this stage). The tuple contains the json name in which data related to that task are/will
+be stored, and a list of the variables that will be collected for each task.
+'''
+
+task_dict = {('Knitters_wip',      '11') : ('Knitters_wip.json',      ['Attendance', 'Style', 'WIP']),
+             ('Linkers_wip',       '12') : ('Linkers_wip.json',       ['Attendance', 'Style', 'WIP']),
              ('Knitters_interact', '21') : ('Knitters_interact.json', ['enter_once_determined']),
-             ('Linkers_interact',  '22') : ('Linkers_interact.json',	['enter_once_determined']),
-             ('Knitters_other',		 '31') : ('Knitters_other.json',    ['enter_once_determined']),
-             ('Linkers_other', 		 '32') : ('Linkers_other.json',	    ['enter_once_determined'])}
+             ('Linkers_interact',  '22') : ('Linkers_interact.json',  ['enter_once_determined']),
+             ('Knitters_other',    '31') : ('Knitters_other.json',    ['enter_once_determined']),
+             ('Linkers_other',     '32') : ('Linkers_other.json',     ['enter_once_determined'])}
 
 def create_task_dicts(top_level_dict, task_dict):
-	""" Function to create task dictionaries. This is designed to be called inside the configure application function. Saves each dict to .json"""
-	#!! This function seems a little erratic as it is based upon using sub-strings to determine how to create the dictionaries. It seems to work, but I am concerned that a small change in the strings entered either in the top_level_dict or the task_dict could prove fatal. At present this was the best I could come up with. Return at a later date perhaps. 
+    """ Function to create task dictionaries. This is designed to be called inside the configure application
+        function. Saves each dict to .json """
+    #!! This function seems a little erratic as it is based upon using sub-strings to determine how to create the
+    #   dictionaries. It seems to work, but I am concerned that a small change in the strings entered either in the
+    #   top_level_dict or the task_dict could prove fatal. At present this was the best I could come up with. Return
+    #   at a later date perhaps. 
 	
-	for task in task_dict.keys():
-		department = task[0].split('_')[0] 
-		task_dict_json = {'date_time' : []}
-		task_dict_json.update({department[:2].upper() + str(serial_no) : {variable : [] for variable in 
-		                                                                  task_dict[task][1]}
+    for task in task_dict.keys():
+        department = task[0].split('_')[0] 
+        task_dict_json = {'date_time' : []}
+        task_dict_json.update({department[:2].upper() + str(serial_no) :
+                                  {variable : [] for variable in task_dict[task][1]}
 		                       for serial_no in xrange(1, top_level_dict[department] + 1)})
-		write_to_json(task_dict_json, task_dict[task][0])
-	return
+        write_to_json(task_dict_json, task_dict[task][0])
+        return
 
 #A string that is used in the configure_appication function
-#¡¡ What is the benfit of making this a global variable rather than one local to the function? It is purely a cleanliness thing (i.e. to keep the function a bit tidier?). Also, why not pass it as an argument to the function?
-Top_validation_fmt = ''' You have entered the following data:
+#¡¡ What is the benfit of making this a global variable rather than one local to the function? It is purely a
+#   cleanliness thing (i.e. to keep the function a bit tidier?). Also, why not pass it as an argument to the
+#   function?
+
+Top_validation_fmt = '''
+You have entered the following data:
 	
 	'Knitters': 	{Knitters}
 	'Linkers' : 	{Linkers}
 
-Are you satisfied with this?'''
+Are you satisfied with this? '''
 
 def configure_application(file_name):
-	""" Creates and returns the top level dictionary and the task dictionaries. Additioanlly tests user satisfaction with the top level data entered and saves to json. It is intended that this is the function that is returned by the open_json function if the json does not already exist when opening the top_level_data."""
-	#¡¡ I am not sure if this is really the right way to program these type of functions that return other functions. This seems to work, but doubtless there is some coding style best practice I have overlooked. 
-	
-	print 'First you need to conifgure the application for the number of operators to be observed'
-	time.sleep(4)
-	
-	# create top level dictionary
-	top_level_dict = {'Knitters' : get_user_int('Please enter the number of Knitting Operators'),
-	                  'Linkers'  : get_user_int('Please enter the number of Linking Operators')}
-	
-	print Top_validation_fmt.format(**top_level_dict) # print data back to user
-	
-	# check user satisfaction
-	user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
-	                                      ('Select one', 'Yes', 'No'))
-	if user_satisfied == 'No':
-		return configure_application(file_name)
-	
-	# save to json
-	write_to_json(top_level_dict, file_name)
-	
-	# Create and save the task dictionaries
-	create_task_dicts(top_level_dict, task_dict)
+    """ Creates and returns the top level dictionary and the task dictionaries. Additioanlly tests user satisfaction
+        with the top level data entered and saves to json. It is intended that this is the function that is returned
+        by the open_json function if the json does not already exist when opening the top_level_data."""
+    #¡¡ I am not sure if this is really the right way to program these type of functions that return other functions.
+    #   This seems to work, but doubtless there is some coding style best practice I have overlooked. 
 
-	return top_level_dict
+    print 'First you need to conifgure the application for the number of operators to be observed'
+    time.sleep(4)
+	
+    # create top level dictionary
+    top_level_dict = { 'Knitters' : get_user_int('Please enter the number of Knitting Operators'),
+                       'Linkers'  : get_user_int('Please enter the number of Linking Operators') }
+
+    print(Top_validation_fmt.format(**top_level_dict))  # print data back to user
+
+    # check user satisfaction
+    user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
+	                                      ('Select one', 'Yes', 'No'))
+    if user_satisfied == 'No':
+        return configure_application(file_name)
+
+    # save to json
+    write_to_json(top_level_dict, file_name)
+
+    # Create and save the task dictionaries
+    create_task_dicts(top_level_dict, task_dict)
+
+    return top_level_dict
 
 def determine_task(user_task_dict = task_dict):
-	''' Function prompts user to determine which task is to be undertaken and return the key (a tuple) that relates to that task fom the task_dict'''
+    ''' Function prompts user to determine which task is to be undertaken and return the key (a tuple) that relates
+        to that task fom the task_dict'''
 	
 	task_choice = str(get_user_choice_num('Select a task', ('Please select a task to complete', 
 	              									                        'Work in progress', 
@@ -200,91 +244,88 @@ def determine_task(user_task_dict = task_dict):
 wip_validation_fmt = ''' You have entered the following data for worker {}:
 	
     'Attendence' : {Attendence} 
-    'Style'      : {Style}
-    'WIP'		 : {WIP} 
+    'Style'.     : {Style}
+    'WIP'        : {WIP} 
 
 Are you satisfied with this?'''
 
 def worker_wip(worker_code):
-	""" Function to create individual worker WIP dict """
-	
-	console.clear()
-	print 'For worker {} please enter thee following information: '.format(worker_code)
-	print
-	
-	# Worker wip dictionary
-	worker_dict = { 'Attendence' : 'Absent',
-	                'Style'			 : 'null',
-	                'WIP'				 : 'null' }
-	# Determine absence
-	user_choice = get_user_choice_text('{} : Is the operator present?'.format(worker_code), 
-	                                                                          ('Please select an option', 
-	                      							                           						 'Present', 
-	                                    							             						 'Absent',))
-	                                    							             
-	# If operator not present
-	if user_choice != 'Present':
-		print wip_validation_fmt.format(worker_code, **worker_dict) # print data back to user
-		time.sleep(2)
-	
-		#check user satisfaction
-		user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
-	                                       ('Select one', 'Yes', 'No'))
-		if user_satisfied == 'No':
+    """ Function to create individual worker WIP dict """
 
-			return worker_wip(worker_code) #re-enter worker wip data
+    console.clear()
+    print('For worker {} please enter thee following information: \n'.format(worker_code))
+
+    # Worker wip dictionary
+    worker_dict = { 'Attendence' : 'Absent',
+	            'Style'.     : 'null',
+	            'WIP'        : 'null' }
+    # Determine absence
+    user_choice = get_user_choice_text('{} : Is the operator present?'.format(worker_code), 
+	                                    ('Please select an option', 'Present', 'Absent',))
+    # If operator not present
+    if user_choice != 'Present':
+         print wip_validation_fmt.format(worker_code, **worker_dict)  # print data back to user
+         time.sleep(2)
+
+    #check user satisfaction
+    user_satisfied = get_user_choice_text('Are you satisfied with data entered?',
+                                             ('Select one', 'Yes', 'No'))
+    if user_satisfied == 'No':
+        return worker_wip(worker_code)  # re-enter worker wip data
+
+    return worker_dict  # return the worker wip dict
+
+    # !!! THE FOLLOWING CODE WILL NEVER GET EXECUTED !!!
 	
-		return worker_dict #return the worker wip dict
+    # If operator present
+    worker_dict['Attendence'] ='Present'
+    prompt = 'Please enter current style name/number as per work order: '
+    worker_dict['Style'] = get_user_input(prompt).strip().lower()
+    prompt = 'Please enter the amount of WIP at time of checking: '
+    worker_dict['WIP'] = get_user_Sfloat(prompt)
+
+    print wip_validation_fmt.format(worker_code, **worker_dict) # print data back to user
+    time.sleep(4)
 	
-	# If operator present
-	worker_dict['Attendence'] ='Present'
-	prompt = 'Please enter current style name/number as per work order: '
-	worker_dict['Style'] = get_user_input(prompt).strip().lower()
-	prompt = 'Please enter the amount of WIP at time of checking: '
-	worker_dict['WIP'] = get_user_Sfloat(prompt)
-	
-	print wip_validation_fmt.format(worker_code, **worker_dict) # print data back to user
-	time.sleep(4)
-	
-	user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
+    user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
 	                                       ('Select one', 'Yes', 'No'))
-	if user_satisfied == 'No':
-		return worker_wip(worker_code) #re-enter worker wip data
+    if user_satisfied == 'No':
+        return worker_wip(worker_code) #re-enter worker wip data
 	
-	return worker_dict #return the worker wip dict
+    return worker_dict #return the worker wip dict
 
 def create_worker_code(top_level_dict, department):
-	""" Function returns a list of the worker codes."""
-	#!! This is somewhat surplus to requirements. The issue is that running though the worker codes in the dictionary json presents the codes out of order. Perhaps an ordered dict could be used instead?
-	
-	return [department[:2].upper() + str(serial_no) for serial_no in 
-	        						xrange(1, top_level_dict[department] + 1)]	
+    """ Function returns a list of the worker codes. """
+    #!! This is somewhat surplus to requirements. The issue is that running though the worker codes in the dictionary
+    #   json presents the codes out of order. Perhaps an ordered dict could be used instead?
+
+    return [department[:2].upper() + str(serial_no) for serial_no in xrange(1, top_level_dict[department] + 1)]	
 
 def wip_task(task_tuple, top_level_dict, task_data_dict):
-	""" Updates relevant wip data dictionary"""
-	
-	task_data_dict['date_time'].append(get_timestamp())
-	department = task_tuple[0].split('_')[0]
-	for worker_code in create_worker_code(top_level_dict, department):
-		worker_wip_dict = worker_wip(worker_code)
-		for data_point in task_data_dict[worker_code]:
-			task_data_dict[worker_code][data_point].append(worker_wip_dict[data_point])
-	
-	return task_data_dict
+    """ Updates relevant wip data dictionary """
+
+    task_data_dict['date_time'].append(get_timestamp())
+    department = task_tuple[0].split('_')[0]
+    for worker_code in create_worker_code(top_level_dict, department):
+        worker_wip_dict = worker_wip(worker_code)
+        for data_point in task_data_dict[worker_code]:
+            task_data_dict[worker_code][data_point].append(worker_wip_dict[data_point])
+
+    return task_data_dict
 
 def interact_task():
-	# complete once defined
-	print 'TBC'
-	return
+    # complete once defined
+    print('TBC')
+    return
 
 def other_task():
-	# complete once defined
-	print 'TBC'
-	return
+    # complete once defined
+    print 'TBC'
+    return
 
 def initiate_task(task_tuple, task_function_dict):
-	task = task_tuple[0].split('_')[1]
-	return task_function_dict[task][0](*task_function_dict[task][1])
+    task = task_tuple[0].split('_')[1]
+    return task_function_dict[task][0](*task_function_dict[task][1])
 
 ###########################################################################################################
 #Run the program
@@ -296,30 +337,28 @@ task_tuple = determine_task()
 task_file_name = task_dict[task_tuple][0]
 task_data_dict = open_json(task_file_name, None, None)
 
-task_function_dict = {'wip' 			: (wip_task, (task_tuple, top_level_dict, task_data_dict)),
-                      'interact' 	: (interact_task, (())),
-                      'other'			: (other_task, (())) }
+task_function_dict = {'wip'.     : (wip_task, (task_tuple, top_level_dict, task_data_dict)),
+                      'interact' : (interact_task, (())),
+                      'other'    : (other_task, (())) }
 
 modified_task_dict = initiate_task(task_tuple, task_function_dict)
 write_to_json(modified_task_dict, task_file_name)
 
-
-
 =======
 >>>>>>> 9542f3cd86c99af7ccdace3de292e2b377dd1191
 def main(argv):
-	console.clear()
-	print 'Welcome to RMG Observations'
-	top_level_dict = open_json('top_level_data.json', configure_application, ('top_level_data.json',))
-	task_tuple = determine_task()
-	task_file_name = task_dict[task_tuple][0]
-	task_data_dict = open_json(task_file_name, None, None)
+    console.clear()
+    print 'Welcome to RMG Observations'
+    top_level_dict = open_json('top_level_data.json', configure_application, ('top_level_data.json',))
+    task_tuple = determine_task()
+    task_file_name = task_dict[task_tuple][0]
+    task_data_dict = open_json(task_file_name, None, None)
 
-	task_function_dict = {'wip'      : (wip_task, (task_tuple, top_level_dict, task_data_dict)),
-        	              'interact' : (interact_task, (())),
-                	      'other'    : (other_task, (())) }
-	modified_task_dict = initiate_task(task_tuple, task_function_dict)
-	write_to_json(modified_task_dict, task_file_name)
+    task_function_dict = {'wip'.     : (wip_task, (task_tuple, top_level_dict, task_data_dict)),
+                          'interact' : (interact_task, (())),
+                           'other'   : (other_task, (())) }
+    modified_task_dict = initiate_task(task_tuple, task_function_dict)
+    write_to_json(modified_task_dict, task_file_name)
 
 	'''
 	at present I am unsure as to what this function does. I realise that it is probably the right way 
@@ -333,12 +372,4 @@ def main(argv):
 	'''
 
 if __name__ == '__main__':
-	sys.exit(main(sys.argv))
-
-	
-
-	
-
-	
-
-	
+    sys.exit(main(sys.argv))

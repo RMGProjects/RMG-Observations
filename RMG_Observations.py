@@ -242,26 +242,16 @@ def locate_most_recent(file_prefix):
 	datetime_list = [datetime.datetime.strptime(date, '%Y_%m_%d_%H_%M') for date in date_list]
 	most_recent_date = max(datetime_list)
 	most_recent_file = file_prefix + '-' + most_recent_date.strftime('%Y_%m_%d_%H_%M')
+	return most_recent_file
 	
 	
-def populate_id_dicts(id_dict):
+def populate_first_id_dict(Args):
+	""" Function to populate the worker id dicts for the first time """
+	pass
 	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+def populate_subsq_id_dict(Args)
+	""" Function to populate worker id dicts based upon previous saved versions """
+	pass	
 
 def determine_task(user_task_dict = task_dict):
     ''' Function prompts user to determine which task is to be undertaken and return the key (a tuple) that relates

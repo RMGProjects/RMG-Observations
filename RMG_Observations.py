@@ -64,7 +64,7 @@ def get_user_choice_num(in_title, in_prompt_and_choices, cancel = True):
         user_choice = console.alert(in_title, *in_prompt_and_choices)
         return user_choice
     except KeyboardInterrupt:
-	pass
+		pass
     Error = 'You may not cancel at this time'
     console.hud_alert(Error, 'error')
     return get_user_choice_num(in_title, in_prompt_and_choices, cancel = False)
@@ -116,7 +116,10 @@ def get_user_input(in_prompt, cancel = False):
         user_input = console.input_alert(in_prompt)
         return user_input
     except KeyboardInterrupt:
-        return get_user_input(in_prompt)
+		pass
+	Error = 'You may not cancel at this time'
+	console.hud_alert(Error, 'error')
+    return get_user_input(in_prompt)
 
 def get_user_approval(in_prompt):
     pass
@@ -125,7 +128,6 @@ def get_user_approval(in_prompt):
 
 def write_to_json(in_dict, file_name):
     ''' Function to save in_dict to json '''
-
     with open(file_name, 'w') as out_file:
         json.dump(in_dict, out_file)
     return
@@ -218,40 +220,152 @@ def configure_application(file_name):
 
     return top_level_dict
 	
-def create_id_dicts(top_level_dict):
-	""" Creates and returns the worker ID dicts for the Knitting and Linking section """
-	
-	dept_choice = str(get_user_choice_text('Select a department', ('Please select which department to work in',
-	                          		                              'Knitting',
-	                              		                          'Linking')))
+def create_id_dicts(top_level_dict, department):
+	""" Creates and returns the a worker ID dict. The entry for each machine code is a dict containing two
+		keys, the first will map to a string equal either to 'Manned' or 'Unmanned, and the second will map to a
+		string equal to the worker id number or null."""
+	# This function will create empty id_dicts, I have not yet been able to test it. 	
+	dept_choice = department
 																  
-	id_dict = 	{date_time : str()}
+	id_dict = 	{'date_time' : str()}
 	id_dict.update(	{dept_choice[:2].upper() + serial_no : 
-					str() for serial_no in xrange(1, top_level_dict[dept_choice] + 1)})
+					{'mc_status' : str(), 'worker_id' : str()}
+					for serial_no in xrange(1, top_level_dict[dept_choice] + 1)})
 	
 	return id_dict
 
 def locate_most_recent(file_prefix):
-	""" Function returns the most recent file that contains file_prefix if any exist"""		
+	""" Function returns the most recent file that contains file_prefix if any exist"""	
+	# This function will search for the most recent daily id dict. If there are none it returns None. I have not
+	# had a chance to test it. 
 	file_list = os.listdir(os.getcwd())
 	prefix_file_list = [file for file in file_list if file_prefix in file]
 	if not prefix_file_list:
-		return 'None' #Not sure about this yet, return to it.
+		return None #Not sure about this yet, return to it.
 	date_list = [date for date in [file.split('-')[1] for file in prefix_file_list] # Note the character on which to
 																					#split the file name is currently '-'	
 	datetime_list = [datetime.datetime.strptime(date, '%Y_%m_%d_%H_%M') for date in date_list]
 	most_recent_date = max(datetime_list)
 	most_recent_file = file_prefix + '-' + most_recent_date.strftime('%Y_%m_%d_%H_%M')
 	return most_recent_file
+
+ID_validation_fmt = '''
+You have entered the following data:
 	
+	'Machine Status'	: 	{mc_status}
+	'Worker ID' 		: 	{worker_id}
+
+Are you satisfied with this? '''
+
+ID_validation_fmt_2 = '''
+The most recent available data for this machine are:
 	
-def populate_first_id_dict(Args):
+	'Machine Status'	: 	{mc_status}
+	'Worker ID' 		: 	{worker_id}
+
+Are you satisfied with this? '''
+
+	
+def worker_id(machine_code):
+	""" Function prompts user for informaiton about the machine and the id of the operator working the machine
+		(if any). Returns dict of that information"""
+	# This generates the worker routine for an individual operator. Rather than thinking about present/absent
+	# the user will simply state is the machine is manned or unmanned. If it is manned they will be prompted
+	# to enter the worker id of the person working on the machine. The fact that manned/unmanned status will be
+	# dealt with here means that the Attendance component of the wip task is now defunct (although the user may wish
+	# to change the manned/unmanned status during the task if for example the worker was absent when the id routine
+	# is run, but present once the wip task is undertaken. 
+	console.clear()
+	print('For machine {} please enter thee following information: \n'.format(machine_code))
+	
+	worker_id_dict = { 'mc_status' : 'Unmanned', 
+					   'worker_id' : 'null'}
+					   
+	user_choice = get_user_choice_text('{} : Please state is machine is manned or unmanned?'.format(machine_code), 
+	                                    ('Please select an option', 'Manned', 'Unmanned',))
+	
+	# If machine unmanned
+    if user_choice != 'Manned':
+         print ID_validation_fmt.format(machine_code, **worker_id_dict)  # print data back to user
+         time.sleep(2)
+
+		#check user satisfaction
+		user_satisfied = get_user_choice_text('Are you satisfied with data entered?',
+                                             ('Select one', 'Yes', 'No'))
+		if user_satisfied == 'No':
+			return worker_id(machine_code)  # re-enter the machine dict data
+
+		return worker_id_dict  # return the machine dict
+	
+	worker_id_dict['mc_status'] = 'Manned'
+	prompt = 'Please enter the id number of the worker on this machine as is appears on their ID card: '
+    worker_id_dict['worker_id'] = get_user_input(prompt).strip().lower()
+	print ID_validation_fmt.format(machine_code, **worker_id_dict) # print data back to user
+    time.sleep(4)
+	
+    user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
+	                                       ('Select one', 'Yes', 'No'))
+    if user_satisfied == 'No':
+        return worker_id(machine_code) #re-enter worker wip data
+	
+    return worker_id_dict #return the worker id dict
+	
+def create_machine_code(top_level_dict, department):
+    """ Function returns a list of the worker codes. """
+    #!! This is somewhat surplus to requirements. The issue is that running though the worker codes in the dictionary
+    #   json presents the codes out of order. Perhaps an ordered dict could be used instead?
+
+    return [department[:2].upper() + str(serial_no) for serial_no in xrange(1, top_level_dict[department] + 1)]
+	
+def populate_first_id_dict(id_dict, top_level_dict, department):
 	""" Function to populate the worker id dicts for the first time """
-	pass
+	# If no daily_id dicts exist then this function will create the first instance of that dict by prompting user
+	# user for the relevant informaiton by calling the worker_id function. I have not yet had the chance to see if 
+	# this works. 
+	id_dict['date_time'].append(get_timestamp())
+	for machine_code in create_machine_code(top_level_dict, department):
+		worker_id_dict = worker_id(machine_code)
+		id_dict[machine_code]['mc_status'] = worker_id_dict['mc_status']
+		id_dict[machine_code]['worker_id'] = worker_id_dict['worker_id']
+	return id_dict
 	
-def populate_subsq_id_dict(Args)
+def populate_id_dict(id_dict, past_id_dict_file_name, top_level_dict, department):
 	""" Function to populate worker id dicts based upon previous saved versions """
-	pass	
+	# This function populates the daily id dict but rather than asking the user for each piece of information it
+	# takes the last known data for that machine and prompts the user to see if they wish to make changes. If they 
+	# do the the worker_id function is called. I have not yet had the chance to see if this is working. 
+	if past_id_dict_file_name is None:
+		return populate_first_id_dict(id_dict, top_level_dict, department)
+	
+	past_id_dict = open_json(past_id_dict_file_name, None, None)
+	for machine_code in create_machine_code(top_level_dict, department):
+		print ID_validation_fmt.format_2(machine_code, **past_id_dict[machine_code]) # print data back to user
+		user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
+											 ('Select one', 'Yes', 'No'))
+		if user_satisfied == 'Yes':
+			id_dict[machine_code]['mc_status'] = past_id_dict[machine_code]['mc_status']
+			id_dict[machine_code]['worker_id'] = past_id_dict[machine_code]['worker_id']
+		else:
+			update_id_dict = worker_id(machine_code)
+			id_dict[machine_code]['mc_status'] = update_id_dict['mc_status']
+			id_dict[machine_code]['worker_id'] = update_id_dict['worker_id']
+	return id_dict
+	
+
+def id_daily_routine(file_prefix, top_level_dict):
+	""" Function that controls the id daily_routine"""
+	# I worry that this is not very elegant, and I have not yet been able to test it. The idea is that this function
+	# controls the entire routine of worker id. In particulatr I worry about all of the functions calling other
+	# functions as part of this routine. It seems like the complexity might make the program hard to debug. 
+
+	daily_file = locate_most_recent(file_prefix + '_id')
+	if daily_file is None:
+		return populate_id_dict(create_id_dicts(top_level_dict, file_prefix), daily_file, top_level_dict, file_prefix)
+	if get_timestamp()[:10] not in daily_file:
+		return populate_id_dict(create_id_dicts(top_level_dict, file_prefix), daily_file, top_level_dict, file_prefix)
+	else:
+		return open_json(daily_file, None, None)
+
 
 def determine_task(user_task_dict = task_dict):
     ''' Function prompts user to determine which task is to be undertaken and return the key (a tuple) that relates
@@ -275,7 +389,7 @@ def determine_task(user_task_dict = task_dict):
 
 
 #A string that is used to display the wip data back to the user
-wip_validation_fmt = ''' You have entered the following data for worker {}:
+wip_validation_fmt = ''' You have entered the following data for machine {}:
 	
     'Attendance' : {Attendance} 
     'Style'.     : {Style}
@@ -284,41 +398,45 @@ wip_validation_fmt = ''' You have entered the following data for worker {}:
 Are you satisfied with this?'''
 
 def worker_wip(machine_code):
-    """ Function to create individual worker WIP dict """
+	### This needs to be updated to reflect the fact that the worker_id task will now deal with the issue
+	### of machines being manned (operator present) or unmanned (operator absent or otherwise not there). 
+    """ Function to create individual machine WIP dict """
 
     console.clear()
-    print('For worker {} please enter thee following information: \n'.format(machine_code))
+    print('For machine {} please enter thee following information: \n'.format(machine_code))
 
-    # Worker wip dictionary
-    worker_dict = { 'Attendance' : 'Absent',
-	            'Style'.     : 'null',
-	            'WIP'        : 'null' }
+    # Machine wip dictionary
+    machine_dict = { 'Attendance' : 'Absent', #The attendance no longer necessary once the ID number routine complete
+					 'Style'.     : 'null',
+					 'WIP'        : 'null' }
     # Determine absence
     user_choice = get_user_choice_text('{} : Is the operator present?'.format(machine_code), 
 	                                    ('Please select an option', 'Present', 'Absent',))
     # If operator not present
     if user_choice != 'Present':
-         print wip_validation_fmt.format(machine_code, **worker_dict)  # print data back to user
+         print wip_validation_fmt.format(machine_code, **machine_dict)  # print data back to user
          time.sleep(2)
 
-    #check user satisfaction
-    user_satisfied = get_user_choice_text('Are you satisfied with data entered?',
+		#check user satisfaction
+		user_satisfied = get_user_choice_text('Are you satisfied with data entered?',
                                              ('Select one', 'Yes', 'No'))
-    if user_satisfied == 'No':
-        return worker_wip(machine_code)  # re-enter worker wip data
+		if user_satisfied == 'No':
+			return worker_wip(machine_code)  # re-enter worker wip data
 
-    return worker_dict  # return the worker wip dict
+		return machine_dict  # return the worker wip dict
 
     # !!! THE FOLLOWING CODE WILL NEVER GET EXECUTED !!!
+	# RC in the version I was working on the indentations above were correct (I have now corrected them here also).
+	# I must have accidentally changed them.
 	
     # If operator present
-    worker_dict['Attendance'] ='Present'
+    machine_dict['Attendance'] ='Present'
     prompt = 'Please enter current style name/number as per work order: '
-    worker_dict['Style'] = get_user_input(prompt).strip().lower()
+    machine_dict['Style'] = get_user_input(prompt).strip().lower()
     prompt = 'Please enter the amount of WIP at time of checking: '
-    worker_dict['WIP'] = get_user_Sfloat(prompt)
+    machine_dict['WIP'] = get_user_Sfloat(prompt)
 
-    print wip_validation_fmt.format(machine_code, **worker_dict) # print data back to user
+    print wip_validation_fmt.format(machine_code, **machine_dict) # print data back to user
     time.sleep(4)
 	
     user_satisfied = get_user_choice_text('Are you satisfied with data entered?', 
@@ -326,14 +444,7 @@ def worker_wip(machine_code):
     if user_satisfied == 'No':
         return worker_wip(machine_code) #re-enter worker wip data
 	
-    return worker_dict #return the worker wip dict
-
-def create_machine_code(top_level_dict, department):
-    """ Function returns a list of the worker codes. """
-    #!! This is somewhat surplus to requirements. The issue is that running though the worker codes in the dictionary
-    #   json presents the codes out of order. Perhaps an ordered dict could be used instead?
-
-    return [department[:2].upper() + str(serial_no) for serial_no in xrange(1, top_level_dict[department] + 1)]	
+    return machine_dict #return the worker wip dict
 
 def wip_task(task_tuple, top_level_dict, task_data_dict):
     """ Updates relevant wip data dictionary """
@@ -383,6 +494,12 @@ def save_user_photo(photo, task_name):
 console.clear()
 print 'Welcome to RMG Observations'
 top_level_dict = open_json('top_level_data.json', configure_application, ('top_level_data.json',))
+today_knitting_id_dict = id_daily_routine('Knitting', top_level_dict)
+today_linking_id_dict = id_daily_routine('Linking', top_level_dict)
+past_knitting_id_file_name = locate_most_recent
+
+
+
 task_tuple = determine_task()
 task_file_name = task_dict[task_tuple][0]
 task_data_dict = open_json(task_file_name, None, None)
@@ -401,6 +518,8 @@ def main(argv):
     console.clear()
     print 'Welcome to RMG Observations'
     top_level_dict = open_json('top_level_data.json', configure_application, ('top_level_data.json',))
+	today_knitting_id_dict = id_daily_routine('Knitting', top_level_dict)
+	today_linking_id_dict = id_daily_routine('Linking', top_level_dict)
     task_tuple = determine_task()
     task_file_name = task_dict[task_tuple][0]
     task_data_dict = open_json(task_file_name, None, None)

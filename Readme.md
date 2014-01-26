@@ -73,22 +73,21 @@ Similar output should be generated for all tasks implemented in this application
 
 1. **Entering Operator ID Numbers** - Conceptually the observations are at the machine level. Therefore each day the first thing the user should do is for each section to enter the worker ID numbers as given by the factory for each machine that is part of the team being observed.
 
-The data that this process will generate will take the following format:
+	The data that this process will generate will take the following format:
 
-	Knitting_IDs = {	'Date' : '01/14/2014',
-						'KN1'  : { 'mc_status' : 'Manned',
-								   'worker_id' : 'foo'}
-						'KN2   : { 'mc_status' : 'Unmanned,
-								   'worker_id' : 'null'}}
+		Knitting_IDs = {	'Date' : '01/14/2014',
+							'KN1'  : { 'mc_status' : 'Manned',
+									   'worker_id' : 'foo'}
+							'KN2   : { 'mc_status' : 'Unmanned,
+									   'worker_id' : 'null'}}
 
-This data will be saved to .json. There will one such file created per day for the Knitting section, and one for the Linking section. This process will be completed upon the user first opening the application which will allow the data to be shared across all the task that need to be completed.
+	This data will be saved to .json. There will one such file created per day for the Knitting section, and one for the Linking section. This process will be completed upon the user first opening the application which will allow the data to be shared across all the task that need to be completed.
 
-This process will supersede the need for the user to comment on the Attendance of each operator during the tasks.
+	This process will supersede the need for the user to comment on the Attendance of each operator during the tasks.
 
-One potential issue is that when the process is first undertaken during the morning and the data is stored a machine may be 'unmanned' (i.e. operator did not show) but by the time that a task is undertaken that operator has arrive (i.e. he was late). The task will have to have a routine that allows the user to modify whether the machine is manned or not. 
+	One potential issue is that when the process is first undertaken during the morning and the data is stored a machine may be 'unmanned' (i.e. operator did not show) but by the time that a task is undertaken that operator has arrive (i.e. he was late). The task will have to have a routine that allows the user to modify whether the machine is manned or not. 
 
-Conceptually this routine could be thought of as a 'task'. However it is not included in the task list, as the user will not have an option to complete it. It must be completed before any tasks can be undertaken, such that the data the worker id function creates can be shared between tasks. 
-
+	conceptually this routine could be thought of as a 'task'. However it is not included in the task list, as the user will not have an option to complete it. It must be completed before any tasks can be undertaken, such that the data the worker id function creates can be shared between tasks. 
 
 2. **Syncing to dropbox** - All data will be synched to drop box
 

@@ -35,11 +35,11 @@ At present the project is in a pilot phase which means that the application will
 
 **Tasks:** Currently two tasks are contemplated although the application has a lot of potential to be expanded. at present the application should be written such that future tasks can be added:
 
-1. **Measuring WIP** - at two points during the day, the user must record the amount of work in progress. Workers may 'hand in' up to 36 pieces at a time in multiples of 12. The receipt of these bundles of 12 is recorded elsewhere. However, as 12/24/36 pieces can take some days to complete recording the number of pieces as work in progress (meaning not yet handed in) is critical to understanding how productive a worker is on a day to day basis.
+1. **Measuring WIP** - at one point during the day (late afternoon), the user must record the amount of work in progress. Workers may 'hand in' up to 48 pieces at a time in multiples of 12. The receipt of these bundles of 12 is recorded elsewhere. However, as 12/24/36/48 pieces can take some days to complete recording the number of pieces as work in progress (meaning not yet handed in) is critical to understanding how productive a worker is on a day to day basis. WIP is measured in increments of 0.25.
 
     For the sake of clarity note that WIP is the number of pieces completed but not handed in.
 
-2. **Recording Interactions** - the scope of this task is not yet fully defined. The basic idea is that for a fixed amount of time the observer will follow a supervisor and record the interaction that he has with the knitting operators.
+2. **Recording Interactions** - the scope of this task is not yet fully defined. The basic idea is that for a fixed amount of time the observer will follow a supervisor and record the interaction that he has with the knitting operators. 
 
 **Output:** There are two levels of output currently envisaged: Top Level Ouput and Task Level Output.
 
@@ -55,13 +55,17 @@ The Task Level Output will vary by task, although data will be stored in diction
 * Measuring WIP (example given in the knitting section with machine id code KN1, KN2 etc.:
 
     WIPDict = { 'DateTime' : '01/14/2014 14:36',
-                'KN1'      : { 'Attendance' : 'Present',
+                'KN1'      : { 'mc_status'  : 'Manned',
                                'Style'      : 7,
                                'WIP'        : 4.25 },
-                'KN2       : { 'Attendance' : 'Present',
-                               'Style'      : 'Grunge',
-                               'WIP'        : 0.75 }
+                'KN2       : { 'mc_status'  : 'Unmanned',
+                               'Style'      : 'null',
+                               'WIP'        : 'null'}
               }
+
+**NB** The mc_status variable will be determined by the worker_id routine that should also be completed by the user. For more information about this routine see the 'Other Functionality' section (below)
+
+Initially it was thought by RC that one such file would maintained throughout the project in which the application will be used. However, upon suggestions from contributors this now seems to be the wrong way to go about it. Rather, one dictionary will be created per task and will be saved with a timestamp and task name. 
 
 Similar output should be generated for all tasks implemented in this application.
 
@@ -72,18 +76,22 @@ Similar output should be generated for all tasks implemented in this application
 The data that this process will generate will take the following format:
 
 	Knitting_IDs = {	'Date' : '01/14/2014',
-						'KN1'  : 'foo'
-						'KN2   : 'bar'}
+						'KN1'  : { 'mc_status' : 'Manned',
+								   'worker_id' : 'foo'}
+						'KN2   : { 'mc_status' : 'Unmanned,
+								   'worker_id' : 'null'}}
 
 This data will be saved to .json. There will one such file created per day for the Knitting section, and one for the Linking section. This process will be completed upon the user first opening the application which will allow the data to be shared across all the task that need to be completed.
 
-This process will supercede the need for the user to comment on the Attendance of each operator during the tasks.
+This process will supersede the need for the user to comment on the Attendance of each operator during the tasks.
 
 One potential issue is that when the process is first undertaken during the morning and the data is stored a machine may be 'unmanned' (i.e. operator did not show) but by the time that a task is undertaken that operator has arrive (i.e. he was late). The task will have to have a routine that allows the user to modify whether the machine is manned or not. 
+
+Conceptually this routine could be thought of as a 'task'. However it is not included in the task list, as the user will not have an option to complete it. It must be completed before any tasks can be undertaken, such that the data the worker id function creates can be shared between tasks. 
 
 
 2. **Syncing to dropbox** - All data will be synched to drop box
 
-3. **Verifying Observer Presence** - It may seem draconian but it is important that the project manager can monitor the observer to check that he is in fact in the factory making the observations. The factory is geographically remote from the head office, and the project manager will rarely be in the field. Ideally this would be achieved with GPS coordinates, however due to limited 3G coverage and no wireless networks in factories, this will not be. One solution could be to prompt the user to take a photo of himself with some identifying object from the factory upon completion of each task [or once in the morning, one in the evening?]
+3. **Verifying Observer Presence** - It may seem draconian but it is important that the project manager can monitor the observer to check that he is in fact in the factory making the observations. The factory is geographically remote from the head office, and the project manager will rarely be in the field. Ideally this would be achieved with GPS coordinates, however due to limited 3G coverage and no wireless networks in factories, this will not be. The current solution is that the user will be prompted to take a photo at the end of each task. The photo will be saved with a timestamp and the task name, and the user will have to take the photo such that it can be clearly demonstrated that he is actually at the factory (i.e in front of one of the machines)
 
 

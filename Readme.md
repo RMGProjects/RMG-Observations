@@ -39,7 +39,17 @@ At present the project is in a pilot phase which means that the application will
 
     For the sake of clarity note that WIP is the number of pieces completed but not handed in.
 
-2. **Recording Interactions** - the scope of this task is not yet fully defined. The basic idea is that for a fixed amount of time the observer will follow a supervisor and record the interaction that he has with the knitting operators. 
+2. **Recording Interactions** - the scope of this task is not yet fully defined, although there is now sufficient information to begin fleshing out the code. The basic idea is to measure the interactions that occur between the supervisor that supervises each of the knitting/linking teams that are being followed. The interactions that are of interest are as follows:
+
++ Supervisor to Operator from own team
++ Supervisor to Operator from another team
++ Supervisor to Supervisor from another team
++ Supervisor to Floor in Charge
++ Supervisor to Production Management
++ Supervisor to Other Management
++ Supervisor to Unknown 
++ Supervisor left floor (unable to follow)
+
 
 **Output:** There are two levels of output currently envisaged: Top Level Ouput and Task Level Output.
 
@@ -56,9 +66,11 @@ The Task Level Output will vary by task, although data will be stored in diction
 
     WIPDict = { 'DateTime' : '01/14/2014 14:36',
                 'KN1'      : { 'mc_status'  : 'Manned',
+							   'worker_id'	: 'foo'
                                'Style'      : 7,
                                'WIP'        : 4.25 },
                 'KN2       : { 'mc_status'  : 'Unmanned',
+							   'worker_id'  : 'null'
                                'Style'      : 'null',
                                'WIP'        : 'null'}
               }
@@ -66,6 +78,35 @@ The Task Level Output will vary by task, although data will be stored in diction
 **NB** The mc_status variable will be determined by the worker_id routine that should also be completed by the user. For more information about this routine see the 'Other Functionality' section (below)
 
 Initially it was thought by RC that one such file would maintained throughout the project in which the application will be used. However, upon suggestions from contributors this now seems to be the wrong way to go about it. Rather, one dictionary will be created per task and will be saved with a timestamp and task name. 
+
+* Interactions (example given in the knitting section with machine id code KN1, KN2 etc. In addition to the machine codes the following will be followed:
+
+	+ 'OO'  -  other operator
+	+ 'OS'  -  other supervisor
+	+ 'FIC' -  floor in charge
+	+ 'PM'  -  production management
+	+ 'OM'  -  other management
+	+ 'O'   -  other
+	
+	At present I suspect it would be easier in terms of the readability of the code to produce this to have one 
+	interaction object (dict) created for each interaction as it is observed, but at the end of the task before
+	the data are uploaded to dropbox for that data to automatically be placed in a task level dictionary that will
+	then be saved to json. The individual interaction dictionary would look as follows (with an interaction with 
+	the floor in charge):
+
+	Interaction1 = { 'interaction_id' : 'FIC', 'interaction_length' : 0.55, 'initiator' : 1, topic : 3}
+	Interaction2 = { 'interaction_id' : 'KN1', 'interaction_length' : 1.32, 'initiator' : 2, topic : 4}
+
+	**NB** Initiator would be a code 1 = supervisor 2 = counterparty. The topic is also a code that will reference
+	some typology of interactions yet to be defined. 
+	
+	Separately a list item could be created that measures the amount of time the supervisor was absent without the
+	observer being able to follow.
+	
+	The task duration would be exactly one hour (say) and at the end of that hour, all of the dictionaries created
+	could be compiled into a single dict to be stored as json. I hold off displaying the format of this for now
+	as it remains unclear to me as to whether the order of the interactions should be preserved, or whether some
+	cumulative measure would suffice.
 
 Similar output should be generated for all tasks implemented in this application.
 

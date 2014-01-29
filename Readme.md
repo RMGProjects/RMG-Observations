@@ -64,15 +64,15 @@ The Task Level Output will vary by task, although data will be stored in diction
 
 * Measuring WIP (example given in the knitting section with machine id code KN1, KN2 etc.:
 
-    WIPDict = { 'DateTime' : '01/14/2014 14:36',
-                'KN1'      : { 'mc_status'  : 'Manned',
-							   'worker_id'	: 'foo',
-                               'Style'      : 7,
-                               'WIP'        : 4.25 },
-                'KN2       : { 'mc_status'  : 'Unmanned',
-							   'worker_id'  : 'null',
-                               'Style'      : 'null',
-                               'WIP'        : 'null'}
+		WIPDict = { 'DateTime' : '01/14/2014 14:36',
+					'KN1'      : { 'mc_status'  : 'Manned',
+								   'worker_id'	: 'foo',
+								   'Style'      : 7,
+								   'WIP'        : 4.25 },
+					'KN2       : { 'mc_status'  : 'Unmanned',
+								   'worker_id'  : 'null',
+								   'Style'      : 'null',
+								   'WIP'        : 'null'}
               }
 
 **NB** The mc_status variable will be determined by the worker_id routine that should also be completed by the user. For more information about this routine see the 'Other Functionality' section (below)
@@ -81,12 +81,12 @@ Initially it was thought by RC that one such file would maintained throughout th
 
 * Interactions (example given in the knitting section with machine id code KN1, KN2 etc. In addition to the machine codes the following will be followed:
 
-		+ 'OO'  -  other operator
-		+ 'OS'  -  other supervisor
-		+ 'FIC' -  floor in charge
-		+ 'PM'  -  production management
-		+ 'OM'  -  other management
-		+ 'O'   -  other
+		'OO'  -  other operator
+		'OS'  -  other supervisor
+		'FIC' -  floor in charge
+		'PM'  -  production management
+		'OM'  -  other management
+		'O'   -  other
 	
 	At present I suspect it would be easier in terms of the readability of the code to produce this to have one 
 	interaction object (dict) created for each interaction as it is observed, but at the end of the task before
@@ -94,8 +94,8 @@ Initially it was thought by RC that one such file would maintained throughout th
 	then be saved to json. The individual interaction dictionary would look as follows (with an interaction with 
 	the floor in charge):
 
-		Interaction1 = { 'interaction_id' : 'FIC', 'interaction_length' : 0.55, 'initiator' : 1, topic : 3}
-		Interaction2 = { 'interaction_id' : 'KN1', 'interaction_length' : 1.32, 'initiator' : 2, topic : 4}
+			Interaction1 = { 'interaction_id' : 'FIC', 'interaction_length' : 0.55, 'initiator' : 1, topic : 3}
+			Interaction2 = { 'interaction_id' : 'KN1', 'interaction_length' : 1.32, 'initiator' : 2, topic : 4}
 
 	**NB** Initiator would be a code 1 = supervisor 2 = counterparty. The topic is also a code that will reference
 	some typology of interactions yet to be defined. 
@@ -118,7 +118,7 @@ Similar output should be generated for all tasks implemented in this application
 
 		Knitting_IDs = {	'Date' : '01/14/2014',
 							'KN1'  : { 'mc_status' : 'Manned',
-									   'worker_id' : 'foo'}
+									   'worker_id' : 'foo'},
 							'KN2   : { 'mc_status' : 'Unmanned,
 									   'worker_id' : 'null'}}
 

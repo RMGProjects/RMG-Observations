@@ -83,17 +83,13 @@ def web_client(in_url = 'http://localhost:8080/machine_counts'):
     webbrowser.open(in_url)
     while not done:
         time.sleep(1)
-    webbrowser.open(in_url + ('/success' if valid_input else '/failure'))
+    the_url = in_url + ('/success' if valid_input else '/failure')
+    webbrowser.open(the_url, stop_when_done=True)
     time.sleep(1)
-    #console.hud_alert('Please tap "Done" in the upper right...')
-    thread.interrupt_main()
         
 def main(argv):
     threading.Thread(None, web_client).start()  # start a web browser
-    try:
-        bottle.run(quiet=True)  # run a web server until interrupted
-    except KeyboardInterrupt:   # browser thread will trigger this interrupt
-        pass
- 
+    bottle.run(quiet=True)  # run a web server until interrupted
+
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

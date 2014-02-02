@@ -1,6 +1,13 @@
 # RMG_set_machine_counts.py
+# RC: I like the look of this interface. I have never seen bottle before, so I am trying to get the hang of this. I
+# do not currently understand totally the flow of control. For example I would like to redirect the user to the
+# get_machine_count form if the entered data are not integers, or if they are not satisfied. 
+# One additional consideration is that I would prefer to not allow the user to touch 'done', or rather for that to
+# capture the exception and return a hud_alert. 
+
 
 import bottle, console, json, sys, thread, threading, time, webbrowser
+from rmg_utils import get_user_choice
 
 done = valid_input = False
 
@@ -73,11 +80,15 @@ def check_results(in_dict):
             done = True
             return  # web_client()  # check_results(in_dict)
         valid_input = True
+	if get_user_choice('Are you satisfied with the data as entered?', 'Please select:', ('Yes', 'No'), in_allow_cancel = False):
         RMG_machine_operators[the_key] = tuple([None for i in xrange(the_value)])
-    print(RMG_machine_operators)
-    with open('RMG_machine_operators.json', 'w') as out_file:
-        json.dump(RMG_machine_operators, out_file)
-    done = True
+		print(RMG_machine_operators)
+		with open('RMG_machine_operators.json', 'w') as out_file:
+			json.dump(RMG_machine_operators, out_file)
+		done = True
+	else:
+		# send user back to get_machine_counts interface
+		pass
 
 def web_client(in_url = 'http://localhost:8080/machine_counts'):
     webbrowser.open(in_url)

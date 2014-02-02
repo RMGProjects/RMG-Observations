@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-
-'''
-<<<<<<< HEAD
-RMG_utils.py -- these utility functions are used by the Ready–Made Garments (RMG) Observation script(s).
-=======
-RMG_utils.py -- these utility functions are used by the Readyâ€“Made Garments (RMG) Observation script(s).
->>>>>>> 9ece0a901d77f7495c52eb2a02165a042bcab486
-    These functions are not specific to RMG use cases but instead are general enough to be useful in
-    other contexts.   We have therefore placed them in this separate file to increase the likelihood of
-    reuse.  This approach should reduce both the size and the complexity of RMG_specific scripts.
-'''
 
 import console, datetime, json, pprint, sys, time, Image, photos
 

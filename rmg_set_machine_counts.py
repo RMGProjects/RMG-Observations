@@ -1,25 +1,22 @@
-# RMG_set_machine_counts.py
-# RC: I like the look of this interface. I have never seen bottle before, so I am trying to get the hang of this. I
-# do not currently understand totally the flow of control. For example I would like to redirect the user to the
-# get_machine_count form if the entered data are not integers, or if they are not satisfied. 
-# One additional consideration is that I would prefer to not allow the user to touch 'done', or rather for that to
-# capture the exception and return a hud_alert. 
-
+# rmg_set_machine_counts.py
 
 import bottle, console, json, sys, thread, threading, time, webbrowser
-from rmg_utils import get_user_choice
+
+machine_operators_file_name = 'rmg_machine_operators.json'
+
+machine_operators = { 'knitting_treatment'  : [],
+                      'knitting_same_floor' : [],
+                      'knitting_different'  : [],
+                      'linking_treatment'   : [],
+                      'linking_same_floor'  : [],
+                      'linking_different'   : [] }
 
 done = valid_input = False
 
-RMG_machine_operators = { 'knitting_treatment'  : [],
-                          'knitting_same_floor' : [],
-                          'knitting_different'  : [],
-                          'linking_treatment'   : [],
-                          'linking_same_floor'  : [],
-                          'linking_different'   : [] }
-
 @bottle.get('/machine_counts')
 def get_machine_counts():
+    the_dict = { k : '<input type="number" name="{}">'.format(k)
+                        for k in machine_operators }
     return '''
 <div style="text-align:center;">
     <h1>Ready Made Garments:  Set Machine Counts</h1>
@@ -27,16 +24,16 @@ def get_machine_counts():
 </div>
 <p>
 <form action="/machine_counts" method="post">
-    Knitting Treatment Group has <input type="number" name="knitting_treatment"> machines.<br>
-    Knitting Same Floor Group has <input type="number" name="knitting_same_floor"> machines.<br>
-    Knitting Different Floor Group has <input type="number" name="knitting_different"> machines.
+    Knitting Treatment Group has {knitting_treatment} machines.<br>
+    Knitting Same Floor Group has {knitting_same_floor} machines.<br>
+    Knitting Different Floor Group {knitting_different} machines.
     <p>
-    Linking Treatment Group has <input type="number" name="linking_treatment"> machines.<br>
-    Linking Same Floor Group has <input type="number" name="linking_same_floor"> machines.<br>
-    Linking Different Floor Group has <input type="number" name="linking_different"> machines.
+    Linking Treatment Group has {linking_treatment} machines.<br>
+    Linking Same Floor Group has {linking_same_floor} machines.<br>
+    Linking Different Floor Group {linking_different} machines.
     <p>
     <input value="Submit" type="submit" />
-</form>'''
+</form>'''.format(**the_dict)
 
 @bottle.post('/machine_counts')
 def post_machine_counts():
@@ -45,8 +42,8 @@ def post_machine_counts():
 @bottle.get('/machine_counts/success')
 def get_machine_counts_success():
     count_dict = { 'tab' : '&nbsp;' * 30 }
-    for key in RMG_machine_operators:
-        count_dict[key] = len(RMG_machine_operators[key])
+    for key in machine_operators:
+        count_dict[key] = len(machine_operators[key])
     return '''
 <div style="text-align:center;">
     <h1>Ready Made Garments:  Tap the "Done" button to finish...</h1>
@@ -78,17 +75,13 @@ def check_results(in_dict):
         except ValueError:
             print('All 6 values must be integers.  Please rerun.')
             done = True
-            return  # web_client()  # check_results(in_dict)
+            return
         valid_input = True
-	if get_user_choice('Are you satisfied with the data as entered?', 'Please select:', ('Yes', 'No'), in_allow_cancel = False):
-        RMG_machine_operators[the_key] = tuple([None for i in xrange(the_value)])
-		print(RMG_machine_operators)
-		with open('RMG_machine_operators.json', 'w') as out_file:
-			json.dump(RMG_machine_operators, out_file)
-		done = True
-	else:
-		# send user back to get_machine_counts interface
-		pass
+        machine_operators[the_key] = tuple(['' for i in xrange(the_value)])
+    print(machine_operators)
+    with open(machine_operators_file_name, 'w') as out_file:
+        json.dump(machine_operators, out_file)
+    done = True
 
 def web_client(in_url = 'http://localhost:8080/machine_counts'):
     webbrowser.open(in_url)
@@ -101,6 +94,6 @@ def web_client(in_url = 'http://localhost:8080/machine_counts'):
 def main(argv):
     threading.Thread(None, web_client).start()  # start a web browser
     bottle.run(quiet=True)  # run a web server until interrupted
-
+ 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

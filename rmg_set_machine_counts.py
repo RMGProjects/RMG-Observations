@@ -1,6 +1,6 @@
 # rmg_set_machine_counts.py
 
-import bottle, console, json, sys, thread, threading, time, webbrowser
+import bottle, json, os, sys, threading, time, webbrowser
 
 machine_operators_file_name = 'rmg_machine_operators.json'
 
@@ -92,6 +92,9 @@ def web_client(in_url = 'http://localhost:8080/machine_counts'):
     time.sleep(1)
         
 def main(argv):
+    if (os.path.isfile(machine_operators_file_name)):
+        fmt = 'The file {} already exists.  Please delete it before running this script.'
+        return fmt.format(machine_operators_file_name)
     threading.Thread(None, web_client).start()  # start a web browser
     bottle.run(quiet=True)  # run a web server until interrupted
  

@@ -2,6 +2,30 @@
 
 import bottle, console, json, pprint, sys, thread, threading, time, webbrowser
 
+#Thanks for this. I have some comments:
+# 1. Since I am new to a lot of this material it would be really useful for me if you could include brief docstrings
+# or comments, just so that I can follow along.
+
+# 2. I do not think all 'teams' should be on the same form. I do not want to compel the user to necessarily do all 
+# of them at the same time. Additionally, the sections may be very far away from each other. Lastly, I feel that
+# doing it team by team will allow for a nicer layout, and prevent larger scale data loss which may be useful for the
+# end user. 
+
+#3. I see how managing the URL by using globals works, but is this the only option? 
+
+# 4. I prefer to have the user state if the machine is manned or unmanned. I feel that leaving blank to indicate
+# unmanned is too passive and could lead to error.
+
+# 5. How can I now check that all machines have been filled in to satisfaction? I need to return messages to the user.
+# ideally the relevant table cell would be highlighted red. Would this use a PUT method?
+
+# 6. See the .tpl file I created that i believe helps to achieve a good layout. It accepts the rmg_machine_operators
+# dict and an indication of what team is being followed at that moment. This could be determined by the console 
+# commands. 
+
+# As a general question how do you return incorrect data to the user without them having to rerun the program? I am
+# having difficulty figuring this out. 
+
 machine_operators_file_name = 'rmg_machine_operators.json'
 
 done = False
